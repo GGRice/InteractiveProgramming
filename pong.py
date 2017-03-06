@@ -63,7 +63,7 @@ class Ball(object):
         self.x = 320
         self.y = 240
         self.angle = math.radians(random.randint(0,360))
-        self.step = 6
+        self.step = 10
         self.dy = int(self.step*math.sin(self.angle))
         self.dx = int(self.step*math.cos(self.angle))
 
