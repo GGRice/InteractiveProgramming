@@ -13,7 +13,8 @@ import random
 
 BLACK = (0, 0, 0)
 BLUE = (0, 0, 255)
-win_score = 5
+WHITE = (255, 255, 255)
+win_score = 2
 
 class PongModel:
     """ Encodes the game state """
@@ -44,12 +45,38 @@ class Score:
 
         if self.p1_score >= win_score or self.p2_score >= win_score:
             self.reset_score()
+            self.message_display('You Lose')
 
         ball.reset()
 
 
     def print_score(self):
         print(self.p1_score, self.p2_score)
+
+    def text_objects(self,text, font):
+        textSurface = font.render(text, True, WHITE)
+        return textSurface, textSurface.get_rect()
+
+    def message_display(self, text):
+        size = (640, 480)
+        screen = pygame.display.set_mode(size)
+
+        largeText = pygame.font.Font('freesansbold.ttf',115)
+        TextSurf, TextRect = self.text_objects(text, largeText)
+        TextRect.center = ((640/2),(480/2))
+        screen.blit(TextSurf, TextRect)
+
+        pygame.display.update()
+
+        time.sleep(2)
+
+        game_loop()
+
+    def score_pygame(self):
+        pass
+        # font=pygame.font.Font(None,30)
+        # scoretext=font.render("Score:"+str(self.p1_score), 1,(0,0,0))
+        # screen.blit(scoretext, (500, 457))
 
 
 
@@ -190,6 +217,8 @@ class PyGameKeyController:
 
 if __name__ == '__main__':
     pygame.init()
+
+    myfont = pygame.font.SysFont("monospace", 15)
     # clock = pygame.time.Clock()
 
     size = (640, 480)
@@ -204,6 +233,7 @@ if __name__ == '__main__':
     # ms = clock.tick()
 
     while running:
+        pygame.display.set_caption('Pro Pong')
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
@@ -217,6 +247,7 @@ if __name__ == '__main__':
             model.score.update_score(model.ball.player_score(), model.ball)
             time.sleep(1)
         model.score.print_score()
+        model.score.score_pygame()
         # ms = clock.tick()
 
     pygame.quit()
