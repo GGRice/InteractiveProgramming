@@ -1,8 +1,7 @@
 """
 Created on Mon February 27, 2017
 
-author: Amon Millner, building upon examples built by previous
-SoftDes instructors, such as Paul Ruvolo and Ben Hill.
+author: Gretchen Rice and Nina Tchirkova
 
 """
 
@@ -67,9 +66,9 @@ class Ball(object):
         self.radius = 10
         self.reset()
 
-    def move(self, paddle1, paddle2):
-        self.y += self.dy
-        self.x += self.dx
+    def move(self, paddle1, paddle2, ms):
+        self.y += int(self.dy / ms)
+        self.x += int(self.dx / ms)
         if self.y >= paddle1.y and self.y <= paddle1.y + paddle1.height and self.x >= paddle1.x and self.x <= paddle1.x + paddle1.width:
             self.angle = -self.angle
             self.dy = int(self.step*math.sin(self.angle))
@@ -169,6 +168,7 @@ class PyGameKeyController:
 
 if __name__ == '__main__':
     pygame.init()
+    clock = pygame.time.Clock()
 
     size = (640, 480)
     screen = pygame.display.set_mode(size)
@@ -179,6 +179,7 @@ if __name__ == '__main__':
 
     running = True
 
+    ms = clock.tick()
     while running:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -186,10 +187,11 @@ if __name__ == '__main__':
             if event.type == pygame.KEYDOWN:
                 controller.handle_key_event(event)
         view.draw()
-        model.ball.move(model.paddle1, model.paddle2)
+        model.ball.move(model.paddle1, model.paddle2, ms)
         time.sleep(.001)
         if model.ball.hits_bad_wall:
             model.score.update_score
         model.score.print_score()
+        ms = clock.tick()
 
     pygame.quit()
