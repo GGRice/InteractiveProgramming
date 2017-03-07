@@ -66,9 +66,9 @@ class Ball(object):
         self.radius = 10
         self.reset()
 
-    def move(self, paddle1, paddle2, ms):
-        self.y += int(self.dy / ms)
-        self.x += int(self.dx / ms)
+    def move(self, paddle1, paddle2): #ms):
+        self.y += int(self.dy)#/ ms)
+        self.x += int(self.dx )#/ ms)
         if self.y >= paddle1.y and self.y <= paddle1.y + paddle1.height and self.x >= paddle1.x and self.x <= paddle1.x + paddle1.width:
             self.angle = -self.angle
             self.dy = int(self.step*math.sin(self.angle))
@@ -99,11 +99,15 @@ class Ball(object):
         self.x = 320
         self.y = 240
 
-        rand = random.randint(1,3)
+        rand = random.randint(1,4)
         if rand == 1:
-            self.angle = math.radians(random.randint(-60,60))
+            self.angle = math.radians(random.randint(15, 75))
+        elif rand ==2:
+            self.angle = math.radians(random.randint(105, 165))
+        elif rand == 3:
+            self.angle = math.radians(random.randint(195, 255))
         else:
-            self.angle = math.radians(random.randint(120, 240))
+            self.angle = math.radians(random.randint(285, 345))
         self.step = 10
 
         self.dy = int(self.step*math.sin(self.angle))
@@ -179,7 +183,7 @@ if __name__ == '__main__':
 
     running = True
 
-    ms = clock.tick()
+
     while running:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -187,7 +191,7 @@ if __name__ == '__main__':
             if event.type == pygame.KEYDOWN:
                 controller.handle_key_event(event)
         view.draw()
-        model.ball.move(model.paddle1, model.paddle2, ms)
+        model.ball.move(model.paddle1, model.paddle2) #, ms)
         time.sleep(.001)
         if model.ball.hits_bad_wall:
             model.score.update_score
