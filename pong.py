@@ -38,10 +38,18 @@ class Ball(object):
         self.radius = 10
         self.reset()
 
-    def move(self):
+    def move(self, paddle1, paddle2):
         self.y += self.dy
         self.x += self.dx
-        if self.y <= 0:
+        if self.y >= paddle1.y and self.y <= paddle1.y + paddle1.height and self.x >= paddle1.x and self.x <= paddle1.x + paddle1.width:
+            self.angle = -self.angle
+            self.dy = int(self.step*math.sin(self.angle))
+            self.dx = int(self.step*math.cos(self.angle))
+        elif self.y <= paddle2.y + paddle2.height and self.y >= paddle2.y and self.x >= paddle2.x and self.x <= paddle2.x + paddle2.width:
+            self.angle = -self.angle
+            self.dy = int(self.step*math.sin(self.angle))
+            self.dx = int(self.step*math.cos(self.angle))
+        elif self.y <= 0:
             self.angle = -self.angle
             self.dy = int(self.step*math.sin(self.angle))
             self.dx = int(self.step*math.cos(self.angle))
@@ -62,7 +70,11 @@ class Ball(object):
     def reset(self):
         self.x = 320
         self.y = 240
-        self.angle = math.radians(random.randint(0,360))
+        rand = random.randint(1,3)
+        if rand == 1:
+            self.angle = math.radians(random.randint(-60,60))
+        else:
+            self.angle = math.radians(random.randint(120, 240))
         self.step = 10
         self.dy = int(self.step*math.sin(self.angle))
         self.dx = int(self.step*math.cos(self.angle))
@@ -138,7 +150,7 @@ if __name__ == '__main__':
             if event.type == pygame.KEYDOWN:
                 controller.handle_key_event(event)
         view.draw()
-        model.ball.move()
+        model.ball.move(model.paddle1, model.paddle2)
         time.sleep(.001)
 
     pygame.quit()
