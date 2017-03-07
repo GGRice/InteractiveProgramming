@@ -123,14 +123,14 @@ class Ball(object):
         return (self.x - pt[0]) ** 2 + (self.y - pt[1]) ** 2 < self.radius ** 2
 
     def hits_bad_wall(self):
-        if self.y == 0 or self.y == 480:
+        if self.y <= 0 or self.y >= 480:
             return True
         return False
 
     def player_score(self):
-        if self.y == 0:
+        if self.y <= 0:
             return 1
-        elif self.y == 480:
+        elif self.y >= 480:
             return 2
         else:
             return 0
@@ -207,6 +207,20 @@ if __name__ == '__main__':
                 running = False
             if event.type == pygame.KEYDOWN:
                 controller.handle_key_event(event)
+
+        keys_pressed = pygame.key.get_pressed()
+        if keys_pressed[pygame.K_LEFT] != 0 and model.paddle1.x > 0:
+            model.paddle1.x = model.paddle1.x - model.paddle1.width/2.0
+
+        if keys_pressed[pygame.K_RIGHT] != 0 and model.paddle1.x < size[0]-model.paddle1.width:
+            model.paddle1.x = model.paddle1.x + model.paddle1.width/2.0
+
+        if keys_pressed[pygame.K_a] != 0 and model.paddle2.x > 0:
+            model.paddle2.x = model.paddle2.x - model.paddle2.width/2.0
+
+        if keys_pressed[pygame.K_d] != 0 and model.paddle2.x < size[0]-model.paddle2.width:
+            model.paddle2.x = model.paddle2.x + model.paddle2.width/2.0
+
         view.draw()
         model.ball.move(model.paddle1, model.paddle2) # , ms)
 
