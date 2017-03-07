@@ -31,28 +31,51 @@ class Score:
         self.p1_score = p1_score
         self.p2_score = p2_score
 
-    def reset_score():
-        p1_score = 0
-        p2_score = 0
+    def reset_score(self):
+        self.p1_score = 0
+        self.p2_score = 0
 
     def update_score(self, player, ball):
-        print('here!')
-        print(self.p1_score, self.p2_score)
         if player == 1:
             self.p1_score += 1
 
         else:
             self.p2_score += 1
 
+        if self.p1_score >= win_score or self.p2_score >= win_score:
+            self.reset_score()
+            self.message_display('You Lose')
+
         ball.reset()
 
-        print(self.p1_score, self.p2_score)
-
-        # if p >= win_score:
-        #    self.reset_score
 
     def print_score(self):
         print(self.p1_score, self.p2_score)
+
+    def text_objects(self,text, font):
+        textSurface = font.render(text, True, WHITE)
+        return textSurface, textSurface.get_rect()
+
+    def message_display(self, text):
+        size = (640, 480)
+        screen = pygame.display.set_mode(size)
+
+        largeText = pygame.font.Font('freesansbold.ttf',115)
+        TextSurf, TextRect = self.text_objects(text, largeText)
+        TextRect.center = ((640/2),(480/2))
+        screen.blit(TextSurf, TextRect)
+
+        pygame.display.update()
+
+        time.sleep(2)
+
+        game_loop()
+
+    def score_pygame(self):
+        pass
+        # font=pygame.font.Font(None,30)
+        # scoretext=font.render("Score:"+str(self.p1_score), 1,(0,0,0))
+        # screen.blit(scoretext, (500, 457))
 
 
 
@@ -72,36 +95,41 @@ class Ball(object):
         self.reset()
 
     def move(self, paddle1, paddle2): # ,ms):
-        self.y += self.dy
-        self.x += self.dx
+        self.ydouble += self.dy
+        self.xdouble += self.dx
 
-        if self.y >= paddle1.y and self.y <= paddle1.y + paddle1.height and self.x >= paddle1.x and self.x <= paddle1.x + paddle1.width:
+        if self.ydouble >= paddle1.y and self.y <= paddle1.y + paddle1.height and self.x >= paddle1.x and self.x <= paddle1.x + paddle1.width:
             self.angle = -self.angle
-            self.dy = int(self.step*math.sin(self.angle))
-            self.dx = int(self.step*math.cos(self.angle))
-        elif self.y <= paddle2.y + paddle2.height and self.y >= paddle2.y and self.x >= paddle2.x and self.x <= paddle2.x + paddle2.width:
+            self.dy = self.step*math.sin(self.angle)
+            self.dx = self.step*math.cos(self.angle)
+        elif self.ydouble <= paddle2.y + paddle2.height and self.y >= paddle2.y and self.x >= paddle2.x and self.x <= paddle2.x + paddle2.width:
             self.angle = -self.angle
-            self.dy = int(self.step*math.sin(self.angle))
-            self.dx = int(self.step*math.cos(self.angle))
-        elif self.y <= 0:
+            self.dy = self.step*math.sin(self.angle)
+            self.dx = self.step*math.cos(self.angle)
+        elif self.ydouble <= 0:
             self.angle = -self.angle
-            self.dy = int(self.step*math.sin(self.angle))
-            self.dx = int(self.step*math.cos(self.angle))
-        elif self.y >= 480:
+            self.dy = self.step*math.sin(self.angle)
+            self.dx = self.step*math.cos(self.angle)
+        elif self.ydouble >= 480:
             self.angle = -self.angle
-            self.dy = int(self.step*math.sin(self.angle))
-            self.dx = int(self.step*math.cos(self.angle))
-        elif self.x <= 0:
+            self.dy = self.step*math.sin(self.angle)
+            self.dx = self.step*math.cos(self.angle)
+        elif self.xdouble <= 0:
             self.angle = math.pi - self.angle
-            self.dy = int(self.step*math.sin(self.angle))
-            self.dx = int(self.step*math.cos(self.angle))
-        elif self.x >= 640:
+            self.dy = self.step*math.sin(self.angle)
+            self.dx = self.step*math.cos(self.angle)
+        elif self.xdouble >= 640:
             self.angle = math.pi - self.angle
-            self.dy = int(self.step*math.sin(self.angle))
-            self.dx = int(self.step*math.cos(self.angle))
+            self.dy = self.step*math.sin(self.angle)
+            self.dx = self.step*math.cos(self.angle)
+
+        self.x = int(self.xdouble)
+        self.y = int(self.ydouble)
 
 
     def reset(self):
+        self.xdouble = 320.0
+        self.ydouble = 240.0
         self.x = 320
         self.y = 240
 
@@ -114,10 +142,10 @@ class Ball(object):
             self.angle = math.radians(random.randint(195, 255))
         else:
             self.angle = math.radians(random.randint(285, 345))
-        self.step = 10
+        self.step = 2
 
-        self.dy = int(self.step*math.sin(self.angle))
-        self.dx = int(self.step*math.cos(self.angle))
+        self.dy = self.step*math.sin(self.angle)
+        self.dx = self.step*math.cos(self.angle)
 
     def contains_pt(self, pt):
         return (self.x - pt[0]) ** 2 + (self.y - pt[1]) ** 2 < self.radius ** 2
@@ -177,13 +205,13 @@ class PyGameKeyController:
 
     def handle_key_event(self, event):
         if event.key == pygame.K_LEFT and self.model.paddle1.x > 0:
-            self.model.paddle1.x = self.model.paddle1.x - self.model.paddle1.width/2.0
+            self.model.paddle1.x = self.model.paddle1.x - self.model.paddle1.width/16.0
         elif event.key == pygame.K_RIGHT and self.model.paddle1.x < size[0]-self.model.paddle1.width:
-            self.model.paddle1.x = self.model.paddle1.x + self.model.paddle1.width/2.0
+            self.model.paddle1.x = self.model.paddle1.x + self.model.paddle1.width/16.0
         elif event.key == pygame.K_a and self.model.paddle2.x > 0:
-            self.model.paddle2.x = self.model.paddle2.x - self.model.paddle2.width/2.0
+            self.model.paddle2.x = self.model.paddle2.x - self.model.paddle2.width/16.0
         elif event.key == pygame.K_d and self.model.paddle2.x < size[0]-self.model.paddle2.width:
-            self.model.paddle2.x = self.model.paddle2.x + self.model.paddle2.width/2.0
+            self.model.paddle2.x = self.model.paddle2.x + self.model.paddle2.width/16.0
 
 
 if __name__ == '__main__':
@@ -210,26 +238,26 @@ if __name__ == '__main__':
 
         keys_pressed = pygame.key.get_pressed()
         if keys_pressed[pygame.K_LEFT] != 0 and model.paddle1.x > 0:
-            model.paddle1.x = model.paddle1.x - model.paddle1.width/2.0
+            model.paddle1.x = model.paddle1.x - model.paddle1.width/16.0
 
         if keys_pressed[pygame.K_RIGHT] != 0 and model.paddle1.x < size[0]-model.paddle1.width:
-            model.paddle1.x = model.paddle1.x + model.paddle1.width/2.0
+            model.paddle1.x = model.paddle1.x + model.paddle1.width/16.0
 
         if keys_pressed[pygame.K_a] != 0 and model.paddle2.x > 0:
-            model.paddle2.x = model.paddle2.x - model.paddle2.width/2.0
+            model.paddle2.x = model.paddle2.x - model.paddle2.width/16.0
 
         if keys_pressed[pygame.K_d] != 0 and model.paddle2.x < size[0]-model.paddle2.width:
-            model.paddle2.x = model.paddle2.x + model.paddle2.width/2.0
+            model.paddle2.x = model.paddle2.x + model.paddle2.width/16.0
 
         view.draw()
         model.ball.move(model.paddle1, model.paddle2) # , ms)
 
         time.sleep(.001)
         if model.ball.hits_bad_wall():
-            print('update')
             model.score.update_score(model.ball.player_score(), model.ball)
             time.sleep(1)
         model.score.print_score()
+        model.score.score_pygame()
         # ms = clock.tick()
 
     pygame.quit()
