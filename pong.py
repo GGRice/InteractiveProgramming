@@ -13,6 +13,7 @@ import random
 
 BLACK = (0, 0, 0)
 BLUE = (0, 0, 255)
+win_score = 5
 
 class PongModel:
     """ Encodes the game state """
@@ -20,6 +21,34 @@ class PongModel:
         self.paddle1 = Paddle((255, 255, 255), 20, 100, 200, 450)
         self.paddle2 = Paddle((255, 255, 255), 20, 100, 200, 10)
         self.ball = Ball()
+        self.score = Score(0, 0)
+
+class Score:
+    """
+        Updates, keeps, and returns score.
+    """
+    def __init__(self, p1_score, p2_score):
+        self.p1_score = p1_score
+        self.p2_score = p2_score
+
+    def reset_score():
+        p1_score = 0
+        p2_score = 0
+
+    def update_score(self, player, ball):
+        if player == 1:
+            self.p1_score += 1
+        else:
+            self.p2_score += 1
+
+        # ball.reset
+
+
+        if player.score >= win_score:
+            self.reset_score
+
+    def print_score(self):
+        print(self.p1_score, self.p2_score)
 
 
 
@@ -63,12 +92,17 @@ class Ball(object):
         self.x = 320
         self.y = 240
         self.angle = math.radians(random.randint(0,360))
-        self.step = 10
+        self.step = 2
         self.dy = int(self.step*math.sin(self.angle))
         self.dx = int(self.step*math.cos(self.angle))
 
     def contains_pt(self, pt):
         return (self.x - pt[0]) ** 2 + (self.y - pt[1]) ** 2 < self.radius ** 2
+
+    def hits_bad_wall(self):
+        if self.y == 0 or self.y == 480:
+            return True
+        return False
 
 class BallView(object):
     def __init__(self, model):
@@ -140,5 +174,8 @@ if __name__ == '__main__':
         view.draw()
         model.ball.move()
         time.sleep(.001)
+        if model.ball.hits_bad_wall:
+            model.score.update_score
+        model.score.print_score()
 
     pygame.quit()
