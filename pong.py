@@ -143,7 +143,7 @@ class Ball(object):
             self.angle = math.radians(random.randint(195, 255))
         else:
             self.angle = math.radians(random.randint(285, 345))
-        self.step = 2
+        self.step = 10
 
         self.dy = self.step*math.sin(self.angle)
         self.dx = self.step*math.cos(self.angle)
@@ -173,6 +173,35 @@ class BallView(object):
     def draw(self, surface):
         model = self.model
         pygame.draw.circle(surface, BLUE, (model.x, int(model.y)), model.radius)
+
+class StartWindowView:
+    def __init__(self, model, screen):
+        self.model = model
+        self.screen = screen
+
+    def text_objects(self,text, font):
+        textSurface = font.render(text, True, WHITE)
+        return textSurface, textSurface.get_rect()
+
+    def draw(self):
+        self.screen.fill(pygame.Color(0, 0, 0))
+        pygame.font.init()
+        myfont = pygame.font.Font('freesansbold.ttf', 30)
+        mylargefont = pygame.font.Font('freesansbold.ttf', 50)
+        TextSurf, TextRect = self.text_objects('Welcome to Pro Pong', mylargefont)
+        TextSurf1, TextRect1 = self.text_objects('Player1: arrow keys', myfont)
+        TextSurf2, TextRect2 = self.text_objects('Player2: A key move left, D key move right', myfont)
+        TextSurf3, TextRect3 = self.text_objects('Press Space Bar to Start', mylargefont)
+        TextRect.center = ((640/2),(480/4))
+        TextRect1.center = ((640/2),(480/2 - 30))
+        TextRect2.center = ((640/2),(480/2 + 30))
+        TextRect3.center = ((640/2),(480/4 * 3))
+        screen.blit(TextSurf, TextRect)
+        screen.blit(TextSurf1, TextRect1)
+        screen.blit(TextSurf2, TextRect2)
+        screen.blit(TextSurf3, TextRect3)
+        pygame.display.update()
+
 
 class PyGameWindowView:
     """ A view of brick breaker rendered in a Pygame window """
@@ -206,13 +235,13 @@ class PyGameKeyController:
 
     def handle_key_event(self, event):
         if event.key == pygame.K_LEFT and self.model.paddle1.x > 0:
-            self.model.paddle1.x = self.model.paddle1.x - self.model.paddle1.width/16.0
+            self.model.paddle1.x = self.model.paddle1.x - self.model.paddle1.width/6.0
         elif event.key == pygame.K_RIGHT and self.model.paddle1.x < size[0]-self.model.paddle1.width:
-            self.model.paddle1.x = self.model.paddle1.x + self.model.paddle1.width/16.0
+            self.model.paddle1.x = self.model.paddle1.x + self.model.paddle1.width/6.0
         elif event.key == pygame.K_a and self.model.paddle2.x > 0:
-            self.model.paddle2.x = self.model.paddle2.x - self.model.paddle2.width/16.0
+            self.model.paddle2.x = self.model.paddle2.x - self.model.paddle2.width/6.0
         elif event.key == pygame.K_d and self.model.paddle2.x < size[0]-self.model.paddle2.width:
-            self.model.paddle2.x = self.model.paddle2.x + self.model.paddle2.width/16.0
+            self.model.paddle2.x = self.model.paddle2.x + self.model.paddle2.width/6.0
 
 
 if __name__ == '__main__':
@@ -225,15 +254,27 @@ if __name__ == '__main__':
     screen = pygame.display.set_mode(size)
 
     model = PongModel()
+    start_view = StartWindowView(model,screen)
     view = PyGameWindowView(model, screen)
     controller = PyGameKeyController(model)
 
     running = True
-
+    start = True
     # ms = clock.tick()
+    pygame.display.set_caption('Pro Pong')
+    while start:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                start = False
+                pygame.quit()
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
+                start = False
+
+
+        start_view.draw()
+
 
     while running:
-        pygame.display.set_caption('Pro Pong')
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
@@ -242,16 +283,16 @@ if __name__ == '__main__':
 
         keys_pressed = pygame.key.get_pressed()
         if keys_pressed[pygame.K_LEFT] != 0 and model.paddle1.x > 0:
-            model.paddle1.x = model.paddle1.x - model.paddle1.width/16.0
+            model.paddle1.x = model.paddle1.x - model.paddle1.width/10.0
 
         if keys_pressed[pygame.K_RIGHT] != 0 and model.paddle1.x < size[0]-model.paddle1.width:
-            model.paddle1.x = model.paddle1.x + model.paddle1.width/16.0
+            model.paddle1.x = model.paddle1.x + model.paddle1.width/10.0
 
         if keys_pressed[pygame.K_a] != 0 and model.paddle2.x > 0:
-            model.paddle2.x = model.paddle2.x - model.paddle2.width/16.0
+            model.paddle2.x = model.paddle2.x - model.paddle2.width/10.0
 
         if keys_pressed[pygame.K_d] != 0 and model.paddle2.x < size[0]-model.paddle2.width:
-            model.paddle2.x = model.paddle2.x + model.paddle2.width/16.0
+            model.paddle2.x = model.paddle2.x + model.paddle2.width/10.0
 
         view.draw()
         model.ball.move(model.paddle1, model.paddle2) # , ms)
