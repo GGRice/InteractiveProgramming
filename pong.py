@@ -45,9 +45,9 @@ class Score:
 
         if self.p1_score >= win_score or self.p2_score >= win_score:
             if self.p1_score >= win_score:
-                self.message_display('Player 1 Wins!')
+                return 1
             elif self.p2_score >= win_score:
-                self.message_display('Player 2 Wins!')
+                return 2
 
             self.reset_score()
 
@@ -57,22 +57,6 @@ class Score:
     def print_score(self):
         print(self.p1_score, self.p2_score)
 
-    def text_objects(self,text, font):
-        textSurface = font.render(text, True, WHITE)
-        return textSurface, textSurface.get_rect()
-
-    def message_display(self, text):
-        size = (640, 480)
-        screen = pygame.display.set_mode(size)
-
-        largeText = pygame.font.Font('freesansbold.ttf', 90)
-        TextSurf, TextRect = self.text_objects(text, largeText)
-        TextRect.center = ((640/2),(480/2))
-        screen.blit(TextSurf, TextRect)
-
-        pygame.display.update()
-
-        time.sleep(2)
 
 
 class Paddle:
@@ -198,6 +182,40 @@ class StartWindowView:
         pygame.display.update()
 
 
+class EndWindowView:
+    def __init__(self, model, screen, player):
+        self.model = model
+        self.screen = screen
+        self.player = player
+
+    def text_objects(self,text, font):
+        textSurface = font.render(text, True, WHITE)
+        return textSurface, textSurface.get_rect()
+
+    def draw(self):
+        self.screen.fill(pygame.Color(0, 0, 0))
+        pygame.font.init()
+        mylargefont = pygame.font.Font('freesansbold.ttf', 50)
+
+        if self.player == 1:
+            TextSurf, TextRect = self.text_objects('Player 1 Wins!', mylargefont)
+        elif self.player == 2:
+            TextSurf, TextRect = self.text_objects('Player 2 Wins!', mylargefont)
+
+        TextSurf2, TextRect2 = self.text_objects('Press Space Bar to Start', mylargefont)
+
+        TextRect.center = ((640/2),(480/4))
+        TextRect2.center = ((640/2),(480/4 * 3))
+        screen.blit(TextSurf, TextRect)
+        screen.blit(TextSurf2, TextRect2)
+
+        model.ball.reset()
+        model.score.reset_score()
+
+        pygame.display.update()
+
+
+
 class PyGameWindowView:
     """ A view of brick breaker rendered in a Pygame window """
     def __init__(self, model, screen):
@@ -221,6 +239,8 @@ class PyGameWindowView:
                          self.model.paddle2.x, self.model.paddle2.y,
                          self.model.paddle2.width, self.model.paddle2.height))
         BallView(self.model.ball).draw(self.screen)
+        scoretext = myfont.render("Score = "+str(model.score.p1_score), 1, WHITE)
+        screen.blit(scoretext, (5, 10))
         pygame.display.update()
 
 
@@ -255,6 +275,7 @@ if __name__ == '__main__':
 
     running = True
     start = True
+    end = False
     # ms = clock.tick()
     pygame.display.set_caption('Pro Pong')
     while start:
@@ -296,8 +317,22 @@ if __name__ == '__main__':
         time.sleep(.001)
         if model.ball.hits_bad_wall():
             model.score.update_score(model.ball.player_score(), model.ball)
+            if model.score.update_score(model.ball.player_score(), model.ball) is not None:
+                player = model.score.update_score(model.ball.player_score(), model.ball)
+                end = True
+                end_view = EndWindowView(model,screen, player)
             time.sleep(1)
         model.score.print_score()
-        # ms = clock.tick()
+
+        while end:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    end = False
+                    running = False
+                if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
+                    end = False
+
+
+            end_view.draw()
 
     pygame.quit()
