@@ -14,6 +14,7 @@ import random
 BLACK = (0, 0, 0)
 BLUE = (0, 0, 255)
 WHITE = (255, 255, 255)
+SKY = (102, 255, 255)
 win_score = 3
 
 class PongModel:
@@ -138,7 +139,7 @@ class Ball(object):
         else:
             self.angle = math.radians(random.randint(285, 345))
         # self.step set to 10 for Nina, 1 for Gretchen
-        self.step = 1
+        self.step = 5
 
         self.dy = self.step*math.sin(self.angle)
         self.dx = self.step*math.cos(self.angle)
@@ -221,8 +222,10 @@ class PyGameWindowView:
                          self.model.paddle2.x, self.model.paddle2.y,
                          self.model.paddle2.width, self.model.paddle2.height))
         BallView(self.model.ball).draw(self.screen)
-        scoretext = myfont.render("Score = "+str(model.score.p1_score), 1, WHITE)
-        screen.blit(scoretext, (5, 10))
+        scoretext1 = myfont.render("PLAYER 2 SCORE: "+str(model.score.p1_score), 1, SKY)
+        screen.blit(scoretext1, (5, 450))
+        scoretext1 = myfont.render("PLAYER 1 SCORE: "+str(model.score.p2_score), 1, SKY)
+        screen.blit(scoretext1, (5, 10))
         pygame.display.update()
 
 
@@ -244,7 +247,7 @@ class PyGameKeyController:
 if __name__ == '__main__':
     pygame.init()
 
-    myfont = pygame.font.SysFont("monospace", 15)
+    myfont = pygame.font.SysFont("monospace", 20)
     # clock = pygame.time.Clock()
 
     size = (640, 480)
