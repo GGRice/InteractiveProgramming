@@ -45,14 +45,16 @@ class Score:
             self.p2_score += 1
 
         if self.p1_score >= win_score or self.p2_score >= win_score:
-            if self.p1_score >= win_score:
-                return 1
-            elif self.p2_score >= win_score:
-                return 2
+            self.winner()
 
-            self.reset_score()
 
         ball.reset()
+
+    def winner(self):
+        if self.p1_score >= win_score:
+            return 1
+        elif self.p2_score >= win_score:
+            return 2
 
 
     def print_score(self):
@@ -74,7 +76,7 @@ class Ball(object):
         self.radius = 10
         self.reset()
 
-    def move(self, paddle1, paddle2): # ,ms):
+    def move(self, paddle1, paddle2):
         self.ydouble += self.dy
         self.xdouble += self.dx
 
@@ -123,7 +125,7 @@ class Ball(object):
         else:
             self.angle = math.radians(random.randint(285, 345))
         # self.step set to 10 for Nina, 1 for Gretchen
-        self.step = 5
+        self.step = 1
 
         self.dy = self.step*math.sin(self.angle)
         self.dx = self.step*math.cos(self.angle)
@@ -169,8 +171,8 @@ class StartWindowView:
         myfont = pygame.font.Font('freesansbold.ttf', 30)
         mylargefont = pygame.font.Font('freesansbold.ttf', 50)
         TextSurf, TextRect = self.text_objects('Welcome to Pro Pong', mylargefont)
-        TextSurf1, TextRect1 = self.text_objects('Player1: arrow keys', myfont)
-        TextSurf2, TextRect2 = self.text_objects('Player2: A key move left, D key move right', myfont)
+        TextSurf1, TextRect1 = self.text_objects('Player1: (bottom) arrow keys', myfont)
+        TextSurf2, TextRect2 = self.text_objects('Player2: (top) A move left, D move right', myfont)
         TextSurf3, TextRect3 = self.text_objects('Press Space Bar to Start', mylargefont)
         TextRect.center = ((640/2),(480/4))
         TextRect1.center = ((640/2),(480/2 - 30))
@@ -200,7 +202,7 @@ class EndWindowView:
 
         if self.player == 1:
             TextSurf, TextRect = self.text_objects('Player 1 Wins!', mylargefont)
-        elif self.player == 2:
+        else:
             TextSurf, TextRect = self.text_objects('Player 2 Wins!', mylargefont)
 
         TextSurf2, TextRect2 = self.text_objects('Press Space Bar to Start', mylargefont)
@@ -209,9 +211,6 @@ class EndWindowView:
         TextRect2.center = ((640/2),(480/4 * 3))
         screen.blit(TextSurf, TextRect)
         screen.blit(TextSurf2, TextRect2)
-
-        model.ball.reset()
-        model.score.reset_score()
 
         pygame.display.update()
 
@@ -240,9 +239,9 @@ class PyGameWindowView:
                          self.model.paddle2.x, self.model.paddle2.y,
                          self.model.paddle2.width, self.model.paddle2.height))
         BallView(self.model.ball).draw(self.screen)
-        scoretext1 = myfont.render("PLAYER 2 SCORE: "+str(model.score.p1_score), 1, SKY)
+        scoretext1 = myfont.render("PLAYER 1 SCORE: "+str(model.score.p1_score), 1, SKY)
         screen.blit(scoretext1, (5, 450))
-        scoretext1 = myfont.render("PLAYER 1 SCORE: "+str(model.score.p2_score), 1, SKY)
+        scoretext1 = myfont.render("PLAYER 2 SCORE: "+str(model.score.p2_score), 1, SKY)
         screen.blit(scoretext1, (5, 10))
         pygame.display.update()
 
@@ -253,20 +252,19 @@ class PyGameKeyController:
 
     def handle_key_event(self, event):
         if event.key == pygame.K_LEFT and self.model.paddle1.x > 0:
-            self.model.paddle1.x = self.model.paddle1.x - self.model.paddle1.width/6.0
+            self.model.paddle1.x = self.model.paddle1.x - self.model.paddle1.width/45.0
         elif event.key == pygame.K_RIGHT and self.model.paddle1.x < size[0]-self.model.paddle1.width:
-            self.model.paddle1.x = self.model.paddle1.x + self.model.paddle1.width/6.0
+            self.model.paddle1.x = self.model.paddle1.x + self.model.paddle1.width/45.0
         elif event.key == pygame.K_a and self.model.paddle2.x > 0:
-            self.model.paddle2.x = self.model.paddle2.x - self.model.paddle2.width/6.0
+            self.model.paddle2.x = self.model.paddle2.x - self.model.paddle2.width/45.0
         elif event.key == pygame.K_d and self.model.paddle2.x < size[0]-self.model.paddle2.width:
-            self.model.paddle2.x = self.model.paddle2.x + self.model.paddle2.width/6.0
+            self.model.paddle2.x = self.model.paddle2.x + self.model.paddle2.width/45.0
 
 
 if __name__ == '__main__':
     pygame.init()
 
     myfont = pygame.font.SysFont("monospace", 20)
-    # clock = pygame.time.Clock()
 
     size = (640, 480)
     screen = pygame.display.set_mode(size)
@@ -279,7 +277,6 @@ if __name__ == '__main__':
     running = True
     start = True
     end = False
-    # ms = clock.tick()
     pygame.display.set_caption('Pro Pong')
     while start:
         for event in pygame.event.get():
@@ -292,7 +289,7 @@ if __name__ == '__main__':
 
         start_view.draw()
 
-
+    index = 0
     while running:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -300,32 +297,38 @@ if __name__ == '__main__':
             if event.type == pygame.KEYDOWN:
                 controller.handle_key_event(event)
 
-        # divide model.paddle.width by 60 for Gretchen, by 10 for Nina
+        # divide model.paddle.width by 45 for Gretchen, by 10 for Nina
         keys_pressed = pygame.key.get_pressed()
         if keys_pressed[pygame.K_LEFT] != 0 and model.paddle1.x > 0:
-            model.paddle1.x = model.paddle1.x - model.paddle1.width/60.0
+            model.paddle1.x = model.paddle1.x - model.paddle1.width/45.0
 
         if keys_pressed[pygame.K_RIGHT] != 0 and model.paddle1.x < size[0]-model.paddle1.width:
-            model.paddle1.x = model.paddle1.x + model.paddle1.width/60.0
+            model.paddle1.x = model.paddle1.x + model.paddle1.width/45.0
 
         if keys_pressed[pygame.K_a] != 0 and model.paddle2.x > 0:
-            model.paddle2.x = model.paddle2.x - model.paddle2.width/60.0
+            model.paddle2.x = model.paddle2.x - model.paddle2.width/45.0
 
         if keys_pressed[pygame.K_d] != 0 and model.paddle2.x < size[0]-model.paddle2.width:
-            model.paddle2.x = model.paddle2.x + model.paddle2.width/60.0
+            model.paddle2.x = model.paddle2.x + model.paddle2.width/45.0
 
-        view.draw()
-        model.ball.move(model.paddle1, model.paddle2) # , ms)
+
 
         time.sleep(.001)
         if model.ball.hits_bad_wall():
             model.score.update_score(model.ball.player_score(), model.ball)
-            if model.score.update_score(model.ball.player_score(), model.ball) is not None:
-                player = model.score.update_score(model.ball.player_score(), model.ball)
+            if model.score.winner() is not None:
+                player = model.score.winner()
                 end = True
                 end_view = EndWindowView(model,screen, player)
+            view.draw()
             time.sleep(1)
-        model.score.print_score()
+        else:
+            view.draw()
+            if index == 0:
+                time.sleep(1)
+            index = 1
+
+        model.ball.move(model.paddle1, model.paddle2)
 
         while end:
             for event in pygame.event.get():
@@ -333,6 +336,9 @@ if __name__ == '__main__':
                     end = False
                     running = False
                 if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
+                    model.ball.reset()
+                    model.score.reset_score()
+                    index = 0
                     end = False
 
 
