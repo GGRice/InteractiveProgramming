@@ -14,7 +14,7 @@ import random
 BLACK = (0, 0, 0)
 BLUE = (0, 0, 255)
 WHITE = (255, 255, 255)
-win_score = 2
+win_score = 3
 
 class PongModel:
     """ Encodes the game state """
