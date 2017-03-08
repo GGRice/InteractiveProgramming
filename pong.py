@@ -298,8 +298,6 @@ if __name__ == '__main__':
             model.score.update_score(model.ball.player_score(), model.ball)
             time.sleep(1)
         model.score.print_score()
-        scoretext = myfont.render("Score = "+str(model.score.p1_score), 1, (0,0,0))
-        screen.blit(scoretext, (5, 10))
         # ms = clock.tick()
 
     pygame.quit()
