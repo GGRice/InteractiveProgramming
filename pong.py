@@ -221,6 +221,8 @@ class PyGameWindowView:
                          self.model.paddle2.x, self.model.paddle2.y,
                          self.model.paddle2.width, self.model.paddle2.height))
         BallView(self.model.ball).draw(self.screen)
+        scoretext = myfont.render("Score = "+str(model.score.p1_score), 1, WHITE)
+        screen.blit(scoretext, (5, 10))
         pygame.display.update()
 
 
@@ -298,8 +300,8 @@ if __name__ == '__main__':
             model.score.update_score(model.ball.player_score(), model.ball)
             time.sleep(1)
         model.score.print_score()
-        scoretext = myfont.render("Score = "+str(model.score.p1_score), 1, (0,0,0))
-        screen.blit(scoretext, (5, 10))
+        # scoretext = myfont.render("Score = "+str(model.score.p1_score), 1, WHITE)
+        # screen.blit(scoretext, (5, 10))
         # ms = clock.tick()
 
     pygame.quit()
