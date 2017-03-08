@@ -44,8 +44,12 @@ class Score:
             self.p2_score += 1
 
         if self.p1_score >= win_score or self.p2_score >= win_score:
+            if self.p1_score >= win_score:
+                self.message_display('Player 1 Wins!')
+            elif self.p2_score >= win_score:
+                self.message_display('Player 2 Wins!')
+
             self.reset_score()
-            self.message_display('You Lose')
 
         ball.reset()
 
@@ -61,7 +65,7 @@ class Score:
         size = (640, 480)
         screen = pygame.display.set_mode(size)
 
-        largeText = pygame.font.Font('freesansbold.ttf',115)
+        largeText = pygame.font.Font('freesansbold.ttf', 90)
         TextSurf, TextRect = self.text_objects(text, largeText)
         TextRect.center = ((640/2),(480/2))
         screen.blit(TextSurf, TextRect)
@@ -69,16 +73,6 @@ class Score:
         pygame.display.update()
 
         time.sleep(2)
-
-        game_loop()
-
-    def score_pygame(self):
-        pass
-        # font=pygame.font.Font(None,30)
-        # scoretext=font.render("Score:"+str(self.p1_score), 1,(0,0,0))
-        # screen.blit(scoretext, (500, 457))
-
-
 
 
 class Paddle:
@@ -143,7 +137,8 @@ class Ball(object):
             self.angle = math.radians(random.randint(195, 255))
         else:
             self.angle = math.radians(random.randint(285, 345))
-        self.step = 10
+        # self.step set to 10 for Nina, 1 for Gretchen
+        self.step = 1
 
         self.dy = self.step*math.sin(self.angle)
         self.dx = self.step*math.cos(self.angle)
@@ -281,18 +276,19 @@ if __name__ == '__main__':
             if event.type == pygame.KEYDOWN:
                 controller.handle_key_event(event)
 
+        # divide model.paddle.width by 60 for Gretchen, by 10 for Nina
         keys_pressed = pygame.key.get_pressed()
         if keys_pressed[pygame.K_LEFT] != 0 and model.paddle1.x > 0:
-            model.paddle1.x = model.paddle1.x - model.paddle1.width/10.0
+            model.paddle1.x = model.paddle1.x - model.paddle1.width/60.0
 
         if keys_pressed[pygame.K_RIGHT] != 0 and model.paddle1.x < size[0]-model.paddle1.width:
-            model.paddle1.x = model.paddle1.x + model.paddle1.width/10.0
+            model.paddle1.x = model.paddle1.x + model.paddle1.width/60.0
 
         if keys_pressed[pygame.K_a] != 0 and model.paddle2.x > 0:
-            model.paddle2.x = model.paddle2.x - model.paddle2.width/10.0
+            model.paddle2.x = model.paddle2.x - model.paddle2.width/60.0
 
         if keys_pressed[pygame.K_d] != 0 and model.paddle2.x < size[0]-model.paddle2.width:
-            model.paddle2.x = model.paddle2.x + model.paddle2.width/10.0
+            model.paddle2.x = model.paddle2.x + model.paddle2.width/60.0
 
         view.draw()
         model.ball.move(model.paddle1, model.paddle2) # , ms)
@@ -302,7 +298,8 @@ if __name__ == '__main__':
             model.score.update_score(model.ball.player_score(), model.ball)
             time.sleep(1)
         model.score.print_score()
-        model.score.score_pygame()
+        scoretext = myfont.render("Score = "+str(model.score.p1_score), 1, (0,0,0))
+        screen.blit(scoretext, (5, 10))
         # ms = clock.tick()
 
     pygame.quit()
