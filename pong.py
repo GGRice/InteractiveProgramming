@@ -13,7 +13,8 @@ import random
 
 BLACK = (0, 0, 0)
 BLUE = (0, 0, 255)
-win_score = 5
+WHITE = (255, 255, 255)
+win_score = 2
 
 class PongModel:
     """ Encodes the game state """
@@ -216,6 +217,8 @@ class PyGameKeyController:
 
 if __name__ == '__main__':
     pygame.init()
+
+    myfont = pygame.font.SysFont("monospace", 15)
     # clock = pygame.time.Clock()
 
     size = (640, 480)
@@ -230,6 +233,7 @@ if __name__ == '__main__':
     # ms = clock.tick()
 
     while running:
+        pygame.display.set_caption('Pro Pong')
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
