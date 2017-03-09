@@ -3,6 +3,9 @@ Created on Mon February 27, 2017
 
 author: Gretchen Rice and Nina Tchirkova
 
+This program creates a version of pong. It is a two player game where players
+control paddles and try to hit a ball past the other player's paddle to score
+points. 
 """
 
 import pygame
