@@ -73,7 +73,9 @@ class Score:
 
 
 class Paddle:
-    """ Encodes the state of the paddle in the game """
+    """
+        Encodes the state of the paddle in the game
+    """
     def __init__(self, color, height, width, x, y):
         self.color = color
         self.height = height
@@ -82,6 +84,10 @@ class Paddle:
         self.y = y
 
 class Ball(object):
+    """
+        Creates ball, includes move class, reset, contains point, and methods to determine which player
+        scores when bll hits top or bottom
+    """
     def __init__(self):
         self.radius = 10
         self.reset()
@@ -177,6 +183,9 @@ class Ball(object):
 
 
 class BallView(object):
+    """
+        Has draw function so puts ball on screen
+    """
     def __init__(self, model):
         self.model = model
 
