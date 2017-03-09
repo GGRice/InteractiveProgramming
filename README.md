@@ -1,9 +1,8 @@
 # InteractiveProgramming
-This is the base repo for the interactive programming project for Software Design, Spring 2016 at Olin College.
 
-To run this code you call python3 pong.py
-If the ball is moving at an unsatisfactory speed you can change the ball_step global variable at the start of the code to any value >1
-If the paddles are moving at an unsatisfactory speed you can change the paddle_speed global variable at the start of the code to any value >1
+To run this code you call python3 pong.py  
+If the ball is moving at an unsatisfactory speed you can change the ball_step global variable at the start of the code to any value >1  
+If the paddles are moving at an unsatisfactory speed you can change the paddle_speed global variable at the start of the code to any value >1  
 Directions on how to play are given upon initiation of game. 
 
 
