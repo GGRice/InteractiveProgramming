@@ -3,9 +3,11 @@ Created on Mon February 27, 2017
 
 author: Gretchen Rice and Nina Tchirkova
 
+Music: http://www.bensound.com
+
 This program creates a version of pong. It is a two player game where players
 control paddles and try to hit a ball past the other player's paddle to score
-points. 
+points.
 """
 
 import pygame
@@ -30,6 +32,7 @@ class PongModel:
         self.paddle2 = Paddle((255, 255, 255), 20, 100, 200, 10)
         self.ball = Ball()
         self.score = Score(0, 0)
+
 
 class Score:
     """
@@ -232,10 +235,11 @@ class EndWindowView:
     """
         Creates end page to show everytime someone wins
     """
-    def __init__(self, model, screen, player):
+    def __init__(self, model, screen, player, wins):
         self.model = model
         self.screen = screen
         self.player = player
+        self.wins = wins
 
     def text_objects(self,text, font):
         textSurface = font.render(text, True, WHITE)
@@ -252,12 +256,19 @@ class EndWindowView:
         else:
             TextSurf, TextRect = self.text_objects('Player 2 Wins!', mylargefont)
 
+
         TextSurf2, TextRect2 = self.text_objects('Press Space Bar to Start', mylargefont)
+
+        # updates how many times each player has won, prints that
+        TextSurf3, TextRect3 = self.text_objects("PLAYER 1 WINS: "+str(self.wins[0]) + "    PLAYER 2 WINS: "+str(self.wins[1]), myfont)
 
         TextRect.center = ((640/2),(480/4))
         TextRect2.center = ((640/2),(480/4 * 3))
+        TextRect3.center = ((640/2),(480/4 * 2))
+
         screen.blit(TextSurf, TextRect)
         screen.blit(TextSurf2, TextRect2)
+        screen.blit(TextSurf3, TextRect3)
 
         pygame.display.update()
 
@@ -267,7 +278,7 @@ class PyGameWindowView:
     """
         A view of brick breaker rendered in a Pygame window
     """
-    def __init__(self, model, screen):
+    def __init__(self, model, screen, wins):
         self.model = model
         self.screen = screen
 
@@ -288,10 +299,20 @@ class PyGameWindowView:
                          self.model.paddle2.x, self.model.paddle2.y,
                          self.model.paddle2.width, self.model.paddle2.height))
         BallView(self.model.ball).draw(self.screen)
+
+        #prints scroe of each player per round
         scoretext1 = myfont.render("PLAYER 1 SCORE: "+str(model.score.p1_score), 1, SKY)
         screen.blit(scoretext1, (5, 450))
         scoretext1 = myfont.render("PLAYER 2 SCORE: "+str(model.score.p2_score), 1, SKY)
         screen.blit(scoretext1, (5, 10))
+
+        #prints total player wins on right side of screen
+        scoretext1 = myfont.render("PLAYER 1 WINS: "+str(wins[0]), 1, SKY)
+        screen.blit(scoretext1, (450, 480/2 +20))
+        scoretext1 = myfont.render("PLAYER 2 WINS: "+str(wins[1]), 1, SKY)
+        screen.blit(scoretext1, (450, 480/2 - 20))
+
+
         pygame.display.update()
 
 
@@ -316,6 +337,7 @@ class PyGameKeyController:
 
 if __name__ == '__main__':
     pygame.init()
+    wins = [0,0] # will keep track of total wins of each player
 
     myfont = pygame.font.SysFont("monospace", 20)
 
@@ -324,13 +346,17 @@ if __name__ == '__main__':
 
     model = PongModel()
     start_view = StartWindowView(model,screen)
-    view = PyGameWindowView(model, screen)
+    view = PyGameWindowView(model, screen, wins)
     controller = PyGameKeyController(model)
 
     running = True
     start = True
     end = False
     pygame.display.set_caption('Pro Pong')
+
+    # plays background music
+    pygame.mixer.music.load('bensound-moose.mp3')
+    pygame.mixer.music.play(loops=-1)
 
     # opens Welcome window and starts game only when spacebar pressed
     while start:
@@ -375,8 +401,12 @@ if __name__ == '__main__':
             if model.score.winner() is not None:
                 # if there is a round winner, will go to exit screen
                 player = model.score.winner()
+                if player == 1:
+                    wins[0] += 1
+                elif player == 2:
+                    wins[1] += 1
                 end = True
-                end_view = EndWindowView(model,screen, player)
+                end_view = EndWindowView(model, screen, player, wins)
             view.draw()
             time.sleep(1) # resets ball to center then waits until moving
         else:
